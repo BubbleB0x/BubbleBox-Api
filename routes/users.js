@@ -3,8 +3,8 @@ var router = express.Router();
 var dbConn = require('../lib/usersDb');
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-  
+router.get('/prova', function (req, res, next) {
+  return res.send('ok');
 });
 
 module.exports = router;

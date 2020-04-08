@@ -35,17 +35,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Public routes
 app.use('/', indexRouter);
-
 //Auth middleware
 app.use(function(req, res, next) {
   auth.authenticateToken(req, res, next)
 });
 
 //privates routes
-app.use('/users', usersRouter);
-app.use('/devices', devicesRouter);
-app.use('/staff', staffRouter);
-app.use('/admin', adminRouter);
+app.use('/users', function(req, res, next) {
+  auth.rbacUsers(req, res, next);
+}, usersRouter);
+app.use('/devices', function(req, res, next) {
+  auth.rbacDevices(req, res, next)
+}, devicesRouter);
+app.use('/staff', function(req, res, next) {
+  auth.rbacStaff(req, res, next)
+}, staffRouter);
+app.use('/admin', function(req, res, next) {
+  auth.rbacAdmin(req, res, next)
+}, adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

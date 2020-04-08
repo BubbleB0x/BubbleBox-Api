@@ -8,7 +8,7 @@ router.get('/', function (req, res, next) {
   res.render('index', { title: 'BubbleBox APIs' });
 });
 
-router.post('/user/login', (req, res) => {
+router.post('/login', (req, res, next) => {
   creds = Buffer.from(req.headers.authorization.split(' ')[1], 'base64').toString('ascii').split(':');
   username = creds[0];
   password = creds[1];
@@ -20,10 +20,9 @@ router.post('/user/login', (req, res) => {
   ], function (err, result) {
     if (err) {
       //non autorizzato
-      res.status(500).send(err);
+      return res.status(500).send(err);
     } else {
       if (result[0] == undefined) {
-        console.log(result)
         return res.status(401).json({ "error": "Username o password errati" });
       } else {
         // render to views/books/index.ejs
