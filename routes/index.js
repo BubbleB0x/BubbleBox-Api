@@ -23,7 +23,7 @@ router.post('/login', (req, res, next) => {
       return res.status(500).send(err);
     } else {
       if (result[0] == undefined) {
-        return res.status(401).json({ "error": "Username o password errati" });
+        return res.status(401).json({ "error": "Wrong username or password" });
       } else {
         // render to views/books/index.ejs
         const token = auth.generateAccessToken({ user: result[0] });
