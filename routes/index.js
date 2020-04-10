@@ -2,18 +2,27 @@ var express = require('express');
 var router = express.Router();
 var auth = require('../lib/auth/auth');
 var dbConn = require('../lib/usersDb');
+var { check, header, validationResult } = require('express-validator');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'BubbleBox APIs' });
 });
 
-router.post('/login', (req, res, next) => {
+router.post('/login', [
+  // Authorization header must be contain
+  header('authorization').exists().isString().contains("Basic ").notEmpty(),
+], (req, res, next) => {
+  // Finds the validation errors in this request and wraps them in an object with handy functions
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
   creds = Buffer.from(req.headers.authorization.split(' ')[1], 'base64').toString('ascii').split(':');
   username = creds[0];
   password = creds[1];
 
-  dbConn.query('SELECT * FROM users WHERE username = ? AND password = ? AND del = ?', [
+  dbConn.query('SELECT id, username, mail, name, surname, fc, birth, sex, role FROM users WHERE username = ? AND password = ? AND del = ?', [
     username,
     password,
     0
