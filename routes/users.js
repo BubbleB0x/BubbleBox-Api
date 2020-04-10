@@ -1,10 +1,21 @@
 var express = require('express');
 var router = express.Router();
 var dbConn = require('../lib/usersDb');
+var { check, header, validationResult, checkSchema } = require('express-validator');
 
-/* GET users listing. */
-router.get('/prova', function (req, res, next) {
-  return res.send('ok');
+router.get('/hs', function (req, res, next) {
+  dbConn.query("SELECT hs FROM users WHERE id = ?", [
+    req.user.id
+  ], function (err, result) {
+    if (err) {
+      //Server error
+      return res.status(500).send(err);
+    } else {
+      console.log(result[0])
+      // return hs
+      return res.status(200).send(result[0]);
+    }
+  });
 });
 
 module.exports = router;
