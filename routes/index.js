@@ -33,4 +33,41 @@ router.post('/login', (req, res, next) => {
   });
 })
 
+router.post('/reg', (req, res) =>{
+
+//console.log(req.body);
+var username_ = req.body.username;
+var password_=req.body.password;
+var email_ = req.body.email;
+var name_=req.body.name;
+var surname_ = req.body.surname;
+var gender_=req.body.gender;
+var date_ = req.body.date;
+var fiscal_code_=req.body.fiscal_code;
+
+
+
+
+
+
+let params=[[username_,password_,email_,name_,surname_,"H",fiscal_code_,date_,gender_,0,"user",0]];
+let query='INSERT INTO users (username, password, mail,name,surname,hs,fc,birth,sex,del,role,verify) VALUES ?;';
+//console.log("params: ",params,"query: ",query);
+
+
+dbConn.query(query,[params],
+  function (err, result) {
+    if (err) {
+     
+      return res.status(500).send(err);
+    } else {
+      console.log(result);
+      res.status(200).send(result);
+    }
+  });
+
+  
+  
+})
+
 module.exports = router;
