@@ -70,4 +70,14 @@ dbConn.query(query,[params],
   
 })
 
+
+router.post('/reporting', (req, res) =>{
+console.log(req.body);
+
+
+
+
+
+
+})
 module.exports = router;
