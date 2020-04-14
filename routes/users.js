@@ -11,7 +11,7 @@ router.get('/hs', function (req, res, next) {
       //Server error
       return res.status(500).send(err);
     } else {
-      console.log(result[0])
+      console.log('ok')
       // return hs
       return res.status(200).send(result[0]);
     }
