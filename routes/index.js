@@ -22,7 +22,7 @@ router.post('/login', [
   username = creds[0];
   password = creds[1];
 
-  dbConn.query('SELECT id, username, mail, name, surname, fc, birth, sex, role FROM users WHERE username = ? AND password = ? AND del = ?', [
+  dbConn.query('SELECT id, username, mail, name, surname, fc, birth, sex, device, role FROM users WHERE username = ? AND password = ? AND del = ?', [
     username,
     password,
     0
@@ -45,7 +45,6 @@ router.post('/loginDevice', [
   // Authorization header must be contain
   header('authorization').exists().isString().contains("Basic ").notEmpty(),
 ], (req, res, next) => {
-  console.log(req.headers);
   // Finds the validation errors in this request and wraps them in an object with handy functions
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -53,7 +52,6 @@ router.post('/loginDevice', [
   }
   creds = Buffer.from(req.headers.authorization.split(' ')[1], 'base64').toString('ascii').split(':::');
   mac = creds[0];
-  console.log(mac)
   password = creds[1];
 
   dbConn.query('SELECT id, mac FROM devices WHERE mac = ? AND password = ? AND del = ?', [
