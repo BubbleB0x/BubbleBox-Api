@@ -23,7 +23,6 @@ router.post('/blast', [
         blasts[blastsIndex][2] = creds[0].replace(/_/g, '-') + ' ' + creds[1]
         blastsIndex++ ;
     });
-    console.log(blasts);
     dbConn.query('INSERT INTO blasts (my_device, enc_device, timestamp) VALUES ?', [
         blasts
     ], function (err, result) {
