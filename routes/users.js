@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var dbConn = require('../lib/usersDb');
+var auth = require('../lib/auth/auth');
+
 var { check, header, validationResult, checkSchema } = require('express-validator');
 
 router.get('/hs', function (req, res, next) {
@@ -25,16 +27,10 @@ router.post('/sync', [
   // Finds the validation errors in this request and wraps them in an object with handy functions
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(422).json({ error: errors.array(), reason: "empty but present field" });
-  }
-  if (!errors.exists()) {
-    return res.status(422).json({ error: errors.array(), reason: "field does not exist" });
-  }
-  if (!errors.isString()) {
-    return res.status(422).json({ error: errors.array(), reason: "" });
+    return res.status(422).json({ errors: errors.array() });
   }
   mac = Buffer.from(req.body.device, 'base64').toString('ascii');
-  dbConn.query('INSERT INTO users (mac) VALUES ? WHERE id = ?', [
+  dbConn.query('UPDATE users SET device = ? WHERE id = ?', [
     mac,
     req.user.id
   ], function (err, result) {
@@ -42,11 +38,9 @@ router.post('/sync', [
       //mysql error
       return res.status(500).send(err);
     } else {
-      user = req.user
-      console.log(user)
-      console.log(result)
-      //const token = auth.generateAccessToken({ user: result[0] });
-      return //res.status(200).json({ "access_token": token });
+      req.user.device = mac;
+      const token = auth.generateAccessToken({ user: req.user });
+      return res.status(200).json({"access_token": token });
     }
   });
 })
