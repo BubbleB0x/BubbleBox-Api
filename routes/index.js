@@ -113,10 +113,30 @@ dbConn.query(query,[params],
 
 
 router.post('/reporting', (req, res) =>{
-console.log(req.body);
+
+var id=req.body[0];
+var symp='';
+for (let index = 1; index < req.body.length; index++) {
+  symp=symp+" "+req.body[index]+", ";
+  
+}
 
 
+let params=[[id,symp]];
+let query='INSERT INTO symptomps (idUser, symp) VALUES ?;';
 
+console.log(params);
+
+dbConn.query(query,[params],
+  function (err, result) {
+    if (err) {
+     
+      return res.status(500).send(err);
+    } else {
+      console.log(result);
+      res.status(200).send(result);
+    }
+  });
 
 
 
