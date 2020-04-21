@@ -23,49 +23,9 @@ router.get('/hs', function (req, res, next) {
   });
 });
 
-<<<<<<< HEAD
-router.get('/id', function (req, res, next) {
- 
-  dbConn.query("SELECT id FROM users WHERE id = ?", [
-    req.user.id
-  ], function (err, result) {
-    if (err) {
-      //Server error
-      return res.status(500).send(err);
-    } else {
-      console.log('ok')
-      // return hs
-      return res.status(200).send(result[0]);
-    }
-  });
-});
-
-router.get('/symp', function (req, res, next) {
- 
-  dbConn.query("SELECT symp FROM symptomps WHERE idUser = ?", [
-    req.user.id
-  ], function (err, result) {
-    if (err) {
-      //Server error
-      return res.status(500).send(err);
-    } else {
-      console.log('ok')
-      console.log(req.user.id);
-      console.log(result);    
-     console.log(result.length);
-     if(result.length==0){
-       console.log("non ci sono report");
-      return res.status(200).send(false);}
-      else return res.status(200).send(true);
-    }
-  });
-});
-
-=======
 /**
  * POST per la sincronizzazione Utente ==> Device
  */
->>>>>>> reporting2
 router.post('/sync', [
   // body device must be contain
   check('device').exists().isString().notEmpty(),
