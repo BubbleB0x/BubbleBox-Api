@@ -3,7 +3,9 @@ var { check, header, validationResult, checkSchema } = require('express-validato
 var router = express.Router();
 var dbConn = require('../lib/usersDb');
 
-/* GET devices listing. */
+/**
+ * POST per inserire un nuovo blast fra 2 utenti
+ */
 router.post('/blast', [
     // Authorization header must be contain
     check('blast').exists().notEmpty().isArray(),
@@ -21,7 +23,7 @@ router.post('/blast', [
         blasts[blastsIndex][0] = creds[2];
         blasts[blastsIndex][1] = creds[3];
         blasts[blastsIndex][2] = creds[0].replace(/_/g, '-') + ' ' + creds[1]
-        blastsIndex++ ;
+        blastsIndex++;
     });
     dbConn.query('INSERT INTO blasts (my_device, enc_device, timestamp) VALUES ?', [
         blasts

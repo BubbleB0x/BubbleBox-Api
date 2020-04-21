@@ -4,43 +4,55 @@ var auth = require('../lib/auth/auth');
 var dbConn = require('../lib/usersDb');
 var { check, header, validationResult } = require('express-validator');
 
-/* GET home page. */
+/* GET di benvenuto. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'BubbleBox APIs' });
 });
 
+/**
+ * POST per l'esecuzione del login
+ */
 router.post('/login', [
-  // Authorization header must be contain
+  // l'Authorization header deve essere presente nella richiesta
   header('authorization').exists().isString().contains("Basic ").notEmpty(),
 ], (req, res, next) => {
-  // Finds the validation errors in this request and wraps them in an object with handy functions
+  // Se non sono rispettate le precondizioni espresse viene restituitoun messaggio d'errore
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
+
+  //Recupero le credenziali dal body, quese sono codificate in base64, dunque eseguo l'encode e poi le separo dalla stringa 'Basic ' della Basic Auth
   creds = Buffer.from(req.headers.authorization.split(' ')[1], 'base64').toString('ascii').split(':');
   username = creds[0];
   password = creds[1];
-
+  // Eseguo laa query per l'autenticazione
   dbConn.query('SELECT id, username, mail, name, surname, fc, birth, sex, device, role FROM users WHERE username = ? AND password = ? AND del = ?', [
     username,
     password,
     0
   ], function (err, result) {
     if (err) {
-      //non autorizzato
+      // Errore MySql
       return res.status(500).send(err);
     } else {
       if (result[0] == undefined) {
+        // Password o Mail errata
         return res.status(401).json({ "error": "Wrong username or password" });
       } else {
+        // Autenticazione riuscita
+        //Genero l'access_token
         const token = auth.generateAccessToken({ user: result[0] });
+        // Invio l'access_token al client
         return res.status(200).json({ "access_token": token });
       }
     }
   });
 })
 
+/**
+ * POST Per il login del device
+ */
 router.post('/loginDevice', [
   // Authorization header must be contain
   header('authorization').exists().isString().contains("Basic ").notEmpty(),
@@ -74,9 +86,11 @@ router.post('/loginDevice', [
   });
 })
 
+/**
+ * POST per la registrazione
+ */
 router.post('/reg', (req, res) =>{
 
-//console.log(req.body);
 var username_ = req.body.username;
 var password_=req.body.password;
 var email_ = req.body.email;
@@ -86,59 +100,18 @@ var gender_=req.body.gender;
 var date_ = req.body.date;
 var fiscal_code_=req.body.fiscal_code;
 
-
-
-
-
-
 let params=[[username_,password_,email_,name_,surname_,"H",fiscal_code_,date_,gender_,0,"user",0]];
 let query='INSERT INTO users (username, password, mail,name,surname,hs,fc,birth,sex,del,role,verify) VALUES ?;';
-//console.log("params: ",params,"query: ",query);
-
 
 dbConn.query(query,[params],
   function (err, result) {
     if (err) {
-     
       return res.status(500).send(err);
     } else {
-      console.log(result);
       res.status(200).send(result);
     }
   });
 
-  
-  
 })
 
-
-router.post('/reporting', (req, res) =>{
-
-var id=req.body[0];
-var symp='';
-for (let index = 1; index < req.body.length; index++) {
-  symp=symp+" "+req.body[index]+", ";
-  
-}
-
-
-let params=[[id,symp]];
-let query='INSERT INTO symptomps (idUser, symp) VALUES ?;';
-
-console.log(params);
-
-dbConn.query(query,[params],
-  function (err, result) {
-    if (err) {
-     
-      return res.status(500).send(err);
-    } else {
-      console.log(result);
-      res.status(200).send(result);
-    }
-  });
-
-
-
-})
 module.exports = router;
